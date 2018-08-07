@@ -74,19 +74,20 @@ import UIKit
             let formatter:NumberFormatter = NumberFormatter()
             formatter.locale = self.locale
             formatter.numberStyle = .currency
-            if !text.contains(formatter.currencySymbol) && cleanNumericString.characters.count > 0 {
+            if !text.contains(formatter.currencySymbol) && cleanNumericString.count > 0 {
                 let lastIndex: String.Index = cleanNumericString.endIndex;
-               cleanNumericString = cleanNumericString.substring(to: cleanNumericString.index(before: lastIndex))
+                cleanNumericString = String(cleanNumericString[..<lastIndex]) // .substring(to: cleanNumericString.index(before: lastIndex))
             }
             
             //Checks if number of digits exceeded max
-            if cleanNumericString.characters.count > self.maxDigits {
-                let limitString = cleanNumericString.substring(to: cleanNumericString.characters.index(cleanNumericString.startIndex, offsetBy: self.maxDigits))
+            if cleanNumericString.count > self.maxDigits {
+                let maxDigitsIndex = cleanNumericString.index(cleanNumericString.startIndex, offsetBy: self.maxDigits)
+                let limitString = String(cleanNumericString[..<maxDigitsIndex]) //cleanNumericString.substring(to: )
                 textFieldNumber = (limitString as NSString).doubleValue
             } else {
                 textFieldNumber = (cleanNumericString as NSString).doubleValue
             }
-
+            
             //Applies mask
             let textFieldNewValue = textFieldNumber/100
             let textFieldStringValue = textFieldNewValue.currencyStringValue(with: self.locale, self.currencySymbol)
@@ -102,10 +103,10 @@ import UIKit
         addTarget(self, action: #selector(textDidChange), for: .editingChanged)
     }
     
-    func textDidChange() {
+    @objc func textDidChange() {
         // get the original position of the cursor
         let cursorOffset = getOriginalCursorPosition();
-        let textFieldLength = text?.characters.count
+        let textFieldLength = text?.count
         maskHandler?(self, NSRange(), "")
         
         // set the cursor back to its original poistion
@@ -115,7 +116,7 @@ import UIKit
     
     override open func closestPosition(to point: CGPoint) -> UITextPosition? {
         let beginning:UITextPosition = self.beginningOfDocument
-        let end:UITextPosition? = self.position(from: beginning, offset: self.text?.characters.count ?? 0)
+        let end:UITextPosition? = self.position(from: beginning, offset: self.text?.count ?? 0)
         return end
     }
     
@@ -129,7 +130,7 @@ import UIKit
     }
     
     private func setCursorOriginalPosition(_ cursorOffset: Int, oldTextFieldLength : Int?){
-        let newLength = self.text?.characters.count
+        let newLength = self.text?.count
         let startPosition : UITextPosition = self.beginningOfDocument
         if let oldTextFieldLength = oldTextFieldLength, let newLength = newLength, oldTextFieldLength > cursorOffset {
             let newOffset = newLength - oldTextFieldLength + cursorOffset
@@ -144,8 +145,8 @@ import UIKit
     open override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
         
         if action == #selector(UITextField.paste(_:))
-        || action == #selector(UITextField.copy(_:))
-        || action == #selector(UITextField.cut(_:)) {
+            || action == #selector(UITextField.copy(_:))
+            || action == #selector(UITextField.cut(_:)) {
             return false
         }
         
