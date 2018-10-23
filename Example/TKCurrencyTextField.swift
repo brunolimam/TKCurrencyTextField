@@ -11,8 +11,6 @@ import UIKit
 @IBDesignable open class TKCurrencyTextField: UITextField {
     @IBInspectable var maxDigits: Int = 15
     @IBInspectable var defaultValue: Double = 0.00
-    public var valueChanged: (() -> ())?
-    
     fileprivate var _maskHandler: ((_ textField: UITextField, _ range: NSRange, _ replacementString: String) -> ())? = nil
     
     var maskHandler: ((_ textField: UITextField, _ range: NSRange, _ replacementString: String) -> ())? {
@@ -54,8 +52,6 @@ import UIKit
             let textFieldNewValue = textFieldNumber/100
             let textFieldStringValue = textFieldNewValue.currencyStringValue
             textField.text = textFieldStringValue
-
-            self.valueChanged?()
         }
         setMaskHandler(currencyHandler)
     }

@@ -32,6 +32,8 @@ import UIKit
         }
         return defaultValue
     }
+
+    public var valueChanged: (() -> ())?
     
     // MARK:- Private vars
     
@@ -92,6 +94,8 @@ import UIKit
             let textFieldNewValue = textFieldNumber/100
             let textFieldStringValue = textFieldNewValue.currencyStringValue(with: self.locale, self.currencySymbol)
             textField.text = textFieldStringValue
+
+            self.valueChanged?()
         }
         setMaskHandler(currencyHandler)
         setAmount(defaultValue)
